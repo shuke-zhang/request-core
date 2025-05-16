@@ -1,7 +1,6 @@
-// @ts-check
+import { Buffer } from 'node:buffer'
 import { spawn } from 'node:child_process'
 import process from 'node:process'
-import { Buffer } from 'node:buffer'
 
 /**
  * @param {string} command

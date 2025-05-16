@@ -45,6 +45,10 @@
     "scss",
     "pcss",
     "postcss"
+  ],
+  "cSpell.words": [
+    "miniprogram",
+    "weixin"
   ]
   // "typescript.tsdk": "example\\uni-example\\node_modules\\typescript\\lib"
 }

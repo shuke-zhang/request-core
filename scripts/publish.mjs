@@ -19,7 +19,7 @@ console.log('开始打包过程...')
 exec('pnpm', [
   'run',
   'build', // 添加打包步骤，如果需要的话
-]).then((res) => {
+]).then(() => {
   console.log('打包完成！')
   console.log('现在开始发布过程...')
 
