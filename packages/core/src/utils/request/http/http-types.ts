@@ -2,7 +2,7 @@ import type {
   AxiosRequestConfig,
   AxiosResponse,
 } from 'axios'
-import { RequiredProperty, ResponseError } from '../shared'
+import type { RequiredProperty, ResponseError } from '../shared'
 /**
  * 基础的RequestConfig 配置
  */
@@ -33,13 +33,13 @@ export type DefaultHttpRequestConfig<T extends object> =
 export type HttpRequestSimpleConfig<T extends object> =
  RequiredProperty<Omit<HttpRequestBaseConfig, 'method' | 'data'>, 'url'> & T
 
- /**
+/**
  * HttpRequestConfigWithoutMethod 配置
  * 去除 method 为了给具体请求函数使用 get / post ...
  */
 export type HttpRequestConfigWithoutMethod<T extends object> =
   RequiredProperty<Omit<HttpRequestBaseConfig, 'method'>, 'url'> & T
-  
+
 /**
  * 拦截器
  */

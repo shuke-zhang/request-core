@@ -1,8 +1,11 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { ContentTypeEnum, DefaultResponseResult, DefaultUserConfig, GetResponseConfig, RequestMethodsEnum, ResponseError } from "../shared";
-import { DefaultHttpRequestConfig, HttpRequestConfig, HttpRequestConfigWithoutMethod, HttpRequestInterceptors, HttpRequestSimpleConfig } from "./http-types";
-import Qs from 'qs'
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import type { DefaultResponseResult, DefaultUserConfig, GetResponseConfig, ResponseError } from '../shared'
+import type { DefaultHttpRequestConfig, HttpRequestConfig, HttpRequestConfigWithoutMethod, HttpRequestInterceptors, HttpRequestSimpleConfig } from './http-types'
+import axios from 'axios'
 import merge from 'lodash.merge'
+import Qs from 'qs'
+import { ContentTypeEnum, RequestMethodsEnum } from '../shared'
+
 export class HttpRequest<
   /**
    * 用户自定义配置
@@ -22,7 +25,7 @@ export class HttpRequest<
    */
   private baseConfig: DefaultHttpRequestConfig<UserConfig>
 
-    constructor(
+  constructor(
     options: DefaultHttpRequestConfig<UserConfig>,
     interceptors?: HttpRequestInterceptors<UserConfig>,
   ) {
@@ -53,7 +56,7 @@ export class HttpRequest<
     }) as any)
   }
 
-   /**
+  /**
    * get 请求
    * @param config
    */
@@ -113,19 +116,18 @@ export class HttpRequest<
     return this.request({ ...config, method: RequestMethodsEnum.DELETE })
   }
 
-/**
- * @description 请求
- */
-    request<D extends object>(config: HttpRequestConfig<UserConfig> & {
+  /**
+   * @description 请求
+   */
+  request<D extends object>(config: HttpRequestConfig<UserConfig> & {
     getResponse: true
   }): Promise<AxiosResponse<UserResponseResult & D>>
-       request<D extends object>(config: HttpRequestConfig<UserConfig>): Promise<UserResponseResult & D>
+  request<D extends object>(config: HttpRequestConfig<UserConfig>): Promise<UserResponseResult & D>
   request<D extends object>(config: HttpRequestConfig<UserConfig>): Promise<AxiosResponse<D> | UserResponseResult & D> {
     const _config = merge({}, this.baseConfig, this.formatFormData(config))
     return this.axiosInstance.request(_config)
   }
 
-  
   /**
    * 格式化 formdata
    * @param config

@@ -45,10 +45,6 @@
     "scss",
     "pcss",
     "postcss"
-  ],
-  // "typescript.tsdk": "example\\uni-example\\node_modules\\typescript\\lib"
-  "cSpell.words": [
-    "bumpp",
-    "jsencrypt"
   ]
+  // "typescript.tsdk": "example\\uni-example\\node_modules\\typescript\\lib"
 }

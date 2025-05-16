@@ -8,6 +8,8 @@ export default antfu({
   },
   vue: true,
 }, {
+  files: ['packages/core/src/**/*.{ts,js,vue}'],
+}, {
   ignores: [
     './dist/*',
   ],
