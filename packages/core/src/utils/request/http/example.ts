@@ -1,5 +1,7 @@
 import type { AxiosRequestConfig, Canceler } from 'axios'
+import type { HttpRequestConfig } from './http-types'
 import axios from 'axios'
+import { cancelInterceptor, generateKey, getSystemErrorMessage, handleError } from '../helpers'
 import { ContentTypeEnum, RequestMethodsEnum } from '../shared'
 import { HttpRequest } from './http'
 
@@ -31,6 +33,8 @@ interface userCustomConfig {
   filename?: string
 };
 
+interface userRequestOptions extends AxiosRequestConfig, userCustomConfig {}
+
 interface userRequestConfig {
   getToken: () => string | null
   tokenKey?: string
@@ -39,6 +43,8 @@ interface userRequestConfig {
 
 interface userToolMethodConfig {
   showMessageSuccess?: (message: string) => void
+  showMessageError?: (message: string) => void
+  toAuth: () => void
   requestError?: (error: any) => (Promise<any> | any)
 }
 
@@ -49,45 +55,48 @@ type ResponseResult<T extends object = object> = {
   message: string
 } & T
 
-export function httpRequest(userConfig: userRequestConfig, userMethodConfig?: userToolMethodConfig) {
+const cancelMap = new Map<string, Canceler>()
+
+export function httpRequest(options: userRequestOptions, userRequestOptionConfig: userRequestConfig, userMethodConfig?: userToolMethodConfig) {
   const request = new HttpRequest<userCustomConfig>(
     {
-      baseURL: 'http://vue.ruoyi.vip',
-      timeout: 3000 * 10,
-      headers: {
+      baseURL: options.baseURL || 'http://vue.ruoyi.vip',
+      timeout: options.timeout || 3000 * 10,
+      headers: options.headers || {
         'Content-Type': ContentTypeEnum.JSON,
       },
       onUploadProgress: (progressEvent) => {
+        return options.onDownloadProgress?.(progressEvent)
         // 上传进度
-        console.log(progressEvent)
       },
       onDownloadProgress(progressEvent) {
         if (progressEvent.total) {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100)
           console.log(`Download Progress: ${progress}%`)
+          options.onUploadProgress?.(progressEvent)
         }
       },
-      withToken: true,
-      joinTime: true,
-      ignoreRepeatRequest: true,
-      showErrorMsg: true,
+      withToken: options.withToken || true,
+      joinTime: options.joinTime || true,
+      ignoreRepeatRequest: options.ignoreRepeatRequest || true,
+      showErrorMsg: options.showErrorMsg || true,
     },
     {
-      // 拦截器
+      // 请求拦截器
       request(config) {
         /**
          * token
          */
-        const token = userConfig.getToken()
+        const token = userRequestOptionConfig.getToken()
         if (config?.withToken && token) {
-          config.headers![userConfig.tokenKey || 'Authorization'] = `${userConfig.tokenKeyScheme || 'Bearer'} ${token}`
+          config.headers![userRequestOptionConfig.tokenKey || 'Authorization'] = `${userRequestOptionConfig.tokenKeyScheme || 'Bearer'} ${token}`
         }
         /**
          * 忽略重复请求。第一个请求未完成时进行第二个请求，第一个会被被取消
          */
         if (config.ignoreRepeatRequest) {
           const key = generateKey({ ...config })
-          const cancelToken = new axios.CancelToken(c => cancelInterceptor(key, c)) // 创建一个取消 token
+          const cancelToken = new axios.CancelToken(c => cancelInterceptor(key, c, cancelMap)) // 创建一个取消 token
           config.cancelToken = cancelToken
         }
         /**
@@ -99,35 +108,45 @@ export function httpRequest(userConfig: userRequestConfig, userMethodConfig?: us
 
         return config
       },
+      // 请求拦截器错误
       requestError(e) {
         // 处理请求错误
         userMethodConfig?.requestError?.(e) || Promise.reject(e)
+      },
+      // 相应拦截器
+      async response(_response) {
+        cancelMap.delete(generateKey(_response.config))
+        const config = _response.config as HttpRequestConfig<userCustomConfig>
+        // 返回原生响应
+        if (config.getResponse) {
+          return _response
+        }
+        const responseData = _response.data as ResponseResult<object>
+
+        if (responseData.code === 200) {
+          return responseData as any
+        }
+
+        if (responseData.code === 401) {
+          // 返回登录页
+          userMethodConfig?.toAuth()
+        }
+
+        const msg = responseData.msg || getSystemErrorMessage(responseData.code)
+        return handleError(msg, userMethodConfig?.showMessageError || (() => {
+          console.log(msg)
+        }), responseData.code !== 401 && !config?.showErrorMsg)
+      },
+      // 响应拦截器错误
+      responseError(error: any) {
+        if (error) {
+          const err = error?.errMsg || error?.msg || error?.message || ''
+          return handleError(err, userMethodConfig?.showMessageError || (() =>
+            console.log(err)))
+        }
       },
     },
   )
 
   return request
-}
-
-/**
- * @description 生成 key 用于取消请求
- * @param config
- * @returns
- */
-export function generateKey(config: AxiosRequestConfig) {
-  const { url, method, params = {}, data = {} } = config
-  return `${url}-${method}-${JSON.stringify(method === 'get' ? params : data)}`
-}
-
-/**
- * @description 取消请求
- * @param key 生成的 key
- * @param canceler 取消函数
- * @param cancelMap 取消请求的 map
- */
-export function cancelInterceptor(key: string, canceler: Canceler, cancelMap = new Map<string, Canceler>()) {
-  if (cancelMap.has(key)) {
-    cancelMap.get(key)?.('cancel repeat request')
-  }
-  cancelMap.set(key, canceler)
 }
