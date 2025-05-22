@@ -1,6 +1,6 @@
 {
   "name": "@shuke~/request",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": false,
   "description": "二次封装的请求方式，0.0.0版本仅仅支持web端",
   "repository": {
