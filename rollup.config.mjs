@@ -7,7 +7,7 @@ import terser from '@rollup/plugin-terser' // 对此输出进行压缩
 import typescript from '@rollup/plugin-typescript'
 // 它允许 Rollup 处理 TypeScript 文件
 import { defineConfig } from 'rollup' // 定义配置
-// import del from 'rollup-plugin-delete' // 删除文件
+import del from 'rollup-plugin-delete' // 删除文件
 
 import dts from 'rollup-plugin-dts' // 它允许 Rollup 生成声明文件（.d.ts 文件）
 import { exec } from './scripts/exec.mjs'
@@ -15,20 +15,22 @@ import { exec } from './scripts/exec.mjs'
  *  @type {import('rollup').InputOptions['plugins']}
  */
 const devPlugins = [
-
+  del({
+    targets: ['packages/core/dist/*', 'packages/core/temp/*'],
+    force: true,
+    hook: 'buildStart',
+  }),
   typescript({
     tsconfig: './packages/core/tsconfig.json', // 指定 tsconfig.json 文件的路径
     declaration: false, // 生成声明文件（.d.ts）
   }),
   nodeResolve(),
-  commonjs({
-    ignoreGlobal: true, // 忽略全局变量检查
-  }),
   replace({
-    preventAssignment: true,
+    preventAssignment: true, // 防止赋值操作
   }),
-  json(),
+  commonjs(),
   terser(),
+  json(),
 ]
 
 /**
@@ -36,10 +38,8 @@ const devPlugins = [
  */
 const buildJs = {
   input: {
-    index: './packages/core/src/utils/request/index.ts',
-    http: './packages/core/src/utils/request/http/http.ts',
-    http_hooks: './packages/core/src/utils/request/http/hooks.ts',
-
+    index: './packages/core/src/request/index.ts',
+    http: './packages/core/src/request/http.ts',
   },
   output: [
     {
@@ -66,7 +66,7 @@ const buildJs = {
 const buildTs = {
   input: {
     index: './packages/core/temp/index.d.ts',
-    shared: './packages/core/temp/shared.d.ts',
+    http: './packages/core/temp/http.d.ts',
   },
   output: [
     {

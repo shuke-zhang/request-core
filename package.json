@@ -14,6 +14,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "bumpp": "^10.1.0",
     "request": "link:",
+    "rollup-plugin-delete": "^3.0.1",
     "rollup-plugin-dts": "^6.2.1"
   },
   "devDependencies": {
