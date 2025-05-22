@@ -66,11 +66,14 @@ const buildJs = {
 const buildTs = {
   input: {
     index: './packages/core/temp/index.d.ts',
+    shared: './packages/core/temp/shared.d.ts',
   },
-  output: {
-    dir: './packages/core/dist',
-    format: 'es',
-  },
+  output: [
+    {
+      dir: './packages/core/dist',
+      format: 'es',
+    },
+  ],
   plugins: [
     nodeResolve(),
     commonjs(),
