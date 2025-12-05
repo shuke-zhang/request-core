@@ -1,6 +1,6 @@
 {
   "name": "@shuke~/request",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "description": "二次封装的请求方式，0.0.0版本仅仅支持web端",
   "repository": {
@@ -46,9 +46,17 @@
     "build": "rollup -c",
     "bumpp": "bumpp"
   },
+  "dependencies": {
+    "add": "^2.0.6",
+    "axios": "^1.13.2",
+    "lodash.merge": "^4.6.2",
+    "qs": "^6.14.0"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-typescript": "^12.1.2"
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/lodash.merge": "^4.6.9",
+    "@types/qs": "^6.14.0"
   }
 }
