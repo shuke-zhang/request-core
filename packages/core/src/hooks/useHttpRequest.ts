@@ -1,8 +1,7 @@
 import type { AxiosRequestConfig, Canceler } from 'axios'
-import type { HttpRequestConfig } from './http'
+import type { HttpRequestConfig } from '../request'
 import axios from 'axios'
-import { HttpRequest } from './http'
-import { cancelInterceptor, ContentTypeEnum, generateKey, getSystemErrorMessage, handleError, RequestMethodsEnum } from './shared'
+import { cancelInterceptor, ContentTypeEnum, generateKey, getSystemErrorMessage, handleError, HttpRequest, RequestMethodsEnum } from '../request'
 
 interface userCustomConfig {
   /**

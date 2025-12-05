@@ -1,17 +1,17 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import process from 'node:process'
+// import fs from 'node:fs'
+// import path from 'node:path'
+// import process from 'node:process'
 import { exec } from './exec.mjs'
 
-const cwd = process.cwd()
-const packageJsonPath = path.resolve(cwd, 'packages', 'core', 'package.json')
-const rawString = fs.readFileSync(packageJsonPath).toString()
-const packageJson = JSON.parse(rawString)
+// const cwd = process.cwd()
+// const packageJsonPath = path.resolve(cwd, 'packages', 'core', 'package.json')
+// const rawString = fs.readFileSync(packageJsonPath).toString()
+// const packageJson = JSON.parse(rawString)
 
 // Temporarily remove dependencies to avoid issues during publish
-packageJson.dependencies = undefined
+// packageJson.dependencies = undefined
 
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+// fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
 
 // 开始打包
 console.log('开始打包过程...')
@@ -37,6 +37,6 @@ exec('pnpm', [
   console.log(publishRes.stderr || publishRes.stdout) // 输出发布结果
 }).finally(() => {
   // 恢复原始的 package.json 内容
-  fs.writeFileSync(packageJsonPath, rawString)
+  // fs.writeFileSync(packageJsonPath, rawString)
   console.log('已恢复原始的 package.json 内容。')
 })

@@ -66,7 +66,6 @@ const buildJs = {
 const buildTs = {
   input: {
     index: './packages/core/temp/index.d.ts',
-    http: './packages/core/temp/http.d.ts',
   },
   output: [
     {
@@ -80,6 +79,7 @@ const buildTs = {
     dts({
       // respectExternal: true,
     }),
+    // 生成ts文件
     {
       name: 'before',
       buildStart: async () => {
@@ -89,6 +89,16 @@ const buildTs = {
           // eslint-disable-next-line node/prefer-global/process
           process.exit(1)
         }
+        const fs = await import('node:fs')
+        const path = await import('node:path')
+
+        const tempDir = path.resolve('packages/core/temp')
+        const indexPath = path.join(tempDir, 'index.d.ts')
+
+        const content = `export * from './hooks';\nexport * from './request';\n`
+
+        fs.writeFileSync(indexPath, content)
+        console.log('自动生成 temp/index.d.ts ✔')
       },
     },
   ],

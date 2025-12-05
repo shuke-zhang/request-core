@@ -73,3 +73,13 @@ export declare function generateKey(config: AxiosRequestConfig): string;
  * @param cancelMap 取消请求的 map
  */
 export declare function cancelInterceptor(key: string, canceler: Canceler, cancelMap?: Map<string, Canceler>): void;
+/**
+ * 从响应头中解析文件名。
+ * 兼容 Content-Disposition 的 filename 和 RFC5987 的 filename* 两种格式。
+ * 例：
+ *   attachment; filename="报告.pdf"
+ *   attachment; filename*=UTF-8''%E6%8A%A5%E5%91%8A.pdf
+ */
+export declare function getResponseFilename(data: {
+    headers: Record<string, string | string[] | undefined>;
+}, key?: string): string | undefined;
